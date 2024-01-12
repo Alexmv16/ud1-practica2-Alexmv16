@@ -1,17 +1,14 @@
-import java.io.*;
-import java.util.*;
-import java.util.regex.*;
+package org.example;
+
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class DescargadorDeImagenes {
-
-    public static void main(String[] args) throws IOException, InterruptedException {
-        String url = "http://ejemplo.com";
-        String html = descargarHTML(url);
-        String[] urlsDeImagenes = extraerUrlsDeImagenes(html);
-
-        // TODO: Crear y gestionar procesos para descargar cada imagen
-        // TODO: Asegurarse de que todos los procesos de descarga finalicen correctamente
-    }
 
     public static String descargarHTML(String url) throws IOException, InterruptedException {
         ProcessBuilder curlPB = new ProcessBuilder("/usr/bin/curl", "-s", "-X", "GET", url);
@@ -27,7 +24,7 @@ public class DescargadorDeImagenes {
         return html.toString();
     }
 
-    public static String[] extraerUrlsDeImagenes(String html) {
+    public static List<String> extraerUrlsDeImagenes(String html) {
         List<String> urlsDeImagenes = new ArrayList<>();
         Pattern pattern = Pattern.compile("<img [^>]*src=[\"']([^\"']+)[\"'][^>]*>");
         Matcher matcher = pattern.matcher(html);
@@ -36,6 +33,13 @@ public class DescargadorDeImagenes {
             urlsDeImagenes.add(matcher.group(1));
         }
 
-        return urlsDeImagenes.toArray(new String[0]);
+        return urlsDeImagenes;
+    }
+
+    public static void descargaImagenes(String url) throws IOException, InterruptedException {
+        ProcessBuilder pb = new ProcessBuilder("/usr/bin/curl", "-O", url);
+        pb.directory(new File("Images"));
+        Process proceso = pb.start();
+        proceso.waitFor();
     }
 }
